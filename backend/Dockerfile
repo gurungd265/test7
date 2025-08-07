@@ -1,11 +1,19 @@
 # ----------- Stage 1: Build -----------
-FROM gradle:8.1.1-jdk17 AS build
-COPY --chown=gradle:gradle . /home/gradle/project
-WORKDIR /home/gradle/project
-RUN gradle build -x test
+FROM gradle:8.1.1-jdk21 AS build
+
+ENV GRADLE_USER_HOME=/home/gradle/.gradle
+WORKDIR /app
+
+# Copy necessary files
+COPY build.gradle settings.gradle /app/
+COPY src /app/src
+
+# Build the project with Java 21
+RUN gradle build -x test --no-daemon
 
 # ----------- Stage 2: Run -------------
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 EXPOSE 8080
-COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
+
+COPY --from=build /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
