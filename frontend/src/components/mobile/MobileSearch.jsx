@@ -12,7 +12,7 @@ export default function MobileSearch({ setIsCatalogOpen }) {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/categories');
+                const response = await axios.get('https://test4-30.onrender.com/api/categories');
                 setCategories(response.data);
             } catch (err) {
                 console.error("카테고리 로딩 실패:", err);
