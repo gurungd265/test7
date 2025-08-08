@@ -1,24 +1,22 @@
-# Step 1: Use Node.js 18+ base image
-FROM node:18 AS build
+# Use Node.js LTS with Alpine (lightweight and compatible)
+FROM node:20-alpine AS builder
 
-# Step 2: Set working directory
 WORKDIR /app
 
-# Step 3: Copy package.json and install dependencies
+# Copy package files first for better caching
 COPY package*.json ./
-RUN npm install
 
-# Step 4: Copy rest of the files
+# Install dependencies (including SWC native bindings)
+RUN npm install --force
+
+# Copy app source
 COPY . .
 
-# Optional: Clear old modules and reinstall cleanly (prevents binding errors)
-RUN rm -rf node_modules && npm install
-
-# Step 5: Build the Vite app
+# Build the app
 RUN npm run build
 
-# Step 6: Serve with Nginx
+# Production stage with Nginx
 FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
