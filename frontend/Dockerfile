@@ -2,7 +2,7 @@
 FROM node:16 AS build
 
 # Step 2: Set the working directory inside the container
-WORKDIR /app
+WORKDIR /
 
 # Step 3: Copy package.json and package-lock.json (or yarn.lock)
 COPY package*.json ./
